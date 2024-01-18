@@ -1,0 +1,20 @@
+// driver program execution examples
+
+bragebrevig@Julies-iMac code % python main.py
+Compiling...
+Executing...
+Do you want to solve for Buckling Beam or Quantum Dots? [1 = Buckling Beam, 2 = Quantum Dots]: 1
+Enter n: 800
+327
+Number of iterations: 1153443
+
+bragebrevig@Julies-iMac code % python main.py
+Compiling...
+Executing...
+Do you want to solve for Buckling Beam or Quantum Dots? [1 = Buckling Beam, 2 = Quantum Dots]: 1
+Enter n: 1000
+Making sure input matrix is symmetric...
+Number of iterations: 1813201
+Time used:1.28117e+03
+Testing orthogonality of computed eigenvectors...
+TEST_orthogonality PASSED!

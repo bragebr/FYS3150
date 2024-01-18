@@ -1,0 +1,97 @@
+\section{Theory \& Background}
+	\subsection{Newton's Universal Law of Gravitation}
+	In this study, we assume that all massive bodies are only under the influence of the gravitational force exerted on them by other massive bodies - a force which is modelled by Newton's universal law of gravitation on its most general vector form
+	\begin{equation}
+		\mathbf{F}_{ij} = -\frac{GM_iM_j}{|r_{ij}|^3}\mathbf{r}_{ij}
+		\label{gravitation}
+	\end{equation}
+	for some massive body $i$ and $j$. Here, $G$ is the gravitational constant\footnote{Its value in SI units is 6.67$\cdot10^{-11}$ m$^3$ kg$^{-1}$ s$^{-2}$}, $|r_{ij}|$ is the vector distance between the two bodies, and $\mathbf{r}_{ij}$ is the radial vector pointing from body $i$ to body $j$. The minus sign indicates that $\mathbf{F}$ is attractive. Should the massive body $i$ be in proximity of $N$ other massive bodies, its motion will be influenced by the gravitational force exerted on it by all of them, such that
+	\[
+	\mathbf{F}^{(\text{NET})}_{i} = -\sum_{j=1}^{N} \frac{GM_iM_j}{|r_{ij}|^3}\mathbf{r}_{ij}
+	\]
+	where $\mathbf{F}^{(\text{NET})}_i$ should be read as the net force acting on a massive body $i$. By Newton's second law of motion we may easily determine the motion of any massive body $i$ by
+	\begin{equation}
+		\frac{\partial^2}{\partial t^2}\mathbf{r}(t) = -\frac{1}{M_i}\sum_{j=1}^{N} \frac{GM_iM_j}{|r_{ij}|^3}\mathbf{r}_{ij} = \frac{1}{M_i}\mathbf{F}^{(\text{NET})}_i
+		\label{difftosolve}
+	\end{equation}
+	
+	The integration is however a two-step process, as for some velocity vector $\mathbf{v}_i(t)$ and some position vector $\mathbf{r}_i(t)$, both belonging to body $i$ we have
+	\begin{equation}
+		\begin{cases}
+		\frac{\partial}{\partial t}\mathbf{v}_i(t) = \frac{1}{M_i}\mathbf{F}^{(\text{NET})}_i\\
+		\frac{\partial}{\partial t}\mathbf{r}_i(t) = \mathbf{v}_i(t)
+		\label{diffcases}
+		\end{cases}
+	\end{equation}
+	where we have devised the fundamental laws of motion\footnote{Velocity is the rate of change of position, whilst acceleration is the rate of change of velocity.}. The equations in \eqref{diffcases} are easily implemented on a computer.
+	\subsection{A Numerical Scheme for the Equations of Motion}
+	Let $p_k := \mathbf{r}(t_k)$ and $u_k := \mathbf{v}(t_k)$ define numerical solutions to the differential equations in \eqref{diffcases}, where $t_k = t_0 + h$ for some temporal step size $h = t_N /N$ where $N$ is a chosen number of numerical grid points such that $k = 1,2,3,...,N$. We may then discretize the equations in \eqref{diffcases} by
+	\begin{equation}
+		\begin{cases}
+		u^{(i)}_{k+1} -u^{(i)}_k = (h/M_i)\mathbf{F}^{(\text{NET})}_i(t_n, u_k)\\
+		 p^{(i)}_{k+1} - p^{(i)}_k = hu^{(i)}_k(t_n, p_k) 
+		\end{cases}
+		\label{discrete}
+	\end{equation}
+	where the superscripts denote that a solution belongs to body $i$. The discrete equations in \eqref{discrete} are on a very general form, as the three different algorithms we shall encounter later treat them differently. We state them here, however, to give the reader a feeling of how we view the evolution of position and velocity numerically.\\
+	
+	\subsection{Astronomical Framework and Units}
+	The solar system is undoubtedly a computationally demanding architecture; it is extremely vast, and contains objects of incredible size. In order to reduce the risk of numerical overflow arising from arithmetic operations with very large numbers, we introduce the astronomical unit (AU) for length, in which the distance from the Earth to the Sun is defined as 1 AU. We shall also consider time in terms of Julian years, where one Julian year is defined as 365.25 days. Lastly, but not least, we shall define all celestial body masses in terms of the solar mass $M_\odot$, by letting $M_\odot := 1$.
+	\begin{table}[H]
+		\centering
+		\caption{Tabular overview of observable values for each planet in the Solar System in astronomical units.}
+		\label{tab2}
+		\begin{tabular}{l|l|l|l}
+			\hline
+			Celestial Body & Mass [kg] & Mass [$M/M_\odot$] & Distance to the Sun [AU]\\
+			\hline
+			Sun & 1.99$\cdot 10^{30}$& 1 & -\\
+			Mercury & 3.30$\cdot10^{23}$ &1.66$\cdot10^{-7}$ &0.39\\
+			Venus & 4.87$\cdot10^{24}$&2.44$\cdot10^{-6}$ &0.72\\
+			Earth & 5.97$\cdot 10^{24}$&3.00$\cdot10^{-6}$ &1.00\\
+			Mars &6.40$\cdot10^{23}$ &3.22$\cdot10^{-7}$ &1.52\\
+			Jupiter &1.90$\cdot10^{27}$ &9.54$\cdot10^{-4}$ &5.20\\
+			Saturn &5.70$\cdot10^{26}$ &2.86$\cdot10^{-4}$ &9.54\\
+			Uranus &8.70$\cdot10^{25}$ &4.37$\cdot10^{-5}$ &19.19\\
+			Neptune &1.02$\cdot10^{26}$ &5.13$\cdot10^{-5}$ &30.06\\
+			Pluto &1.46$\cdot10^{22}$ & 7.34$\cdot10^{-9}$&39.53
+		\end{tabular}
+	\end{table}
+	Working within this frame also allows us to deal with the gravitational constant in a much computationally friendly way. The first part of the project will be concerned with the Earth-Sun system, where the force $F_G$ acting on the Earth from the Sun is given by
+	\begin{equation}
+		F_G = \frac{GM_\odot M_\oplus}{r^2}
+	\end{equation}
+	where $M_\odot$ is the mass of the Sun, $M_\oplus$ is the mass of the Earth, and $r$ is the length of the radial vector pointing from the Earth to the Sun. Here we also omit the minus sign, assuming it is known by now that $F_G$ is attractive. Suppose now that the Earth is constrained to a perfectly circular orbit around the Sun. In this respect, we may observe that the Earth is held in orbit by some centripetal force such that
+	\[
+	M_\oplus r\omega^2 = \frac{GM_\odot M_\oplus}{r^2}
+	\]
+	where $\omega = 2\pi/T$ is the angular frequency of Earth and $T$ is its orbital period being one Julian year. Observe now that
+	\begin{equation}
+	G = \frac{4\pi^2r^3}{T^2M_\odot}\label{gconst}
+	\end{equation}
+	Since we have defined $r, T \ \text{and} \  M_\odot$ already, we have $G = 4\pi^2$ AU$^3$ M$^{-1}_\odot$ yr$^{-2}$. Similarly, we may define the centripetal force acting on Earth by $M_\oplus \nu^2/r$, where $\nu$ is the orbital velocity of Earth, leading to
+	\[
+	\nu^2 = \frac{GM_\odot}{r}
+	\]
+	or $\nu = 2\pi$ AU yr$^{-1}$ by the previous definitions.   
+	
+	\subsection{Escape Velocity}
+	The escape velocity of a planet in a simple binary planet-Sun system, is the minimum velocity required to escape the Sun's gravitational pull. This is achieved when the sum of the kinetic and potential energy of a planet is greater than zero. In this study we shall only devise this theory as a benchmark test to see whether or not our program correctly computes the motion of the Earth when only under the influence of the gravitational pull from the Sun, meaning that
+	\begin{align}
+	    &\frac{1}{2}M_\oplus v^2 - G\frac{M_\odot M_\oplus}{r^2}r \geq 0\\
+	    \\
+	    &v \geq \sqrt{2G\frac{M_\odot}{r}}
+	\end{align}
+	By inserting $G$ from \eqref{gconst}, $M_\odot := 1 $ and $r = 1$, we find that theoretically that a minimum velocity of $\sqrt{8}\pi$ is needed in order for the Earth to escape its orbit around the Sun. We may now use this to see at what initial velocities the Earth 'stays or strays' in the model we shall implement numerically, and compare this to the theoretical value in order to validate the model.
+	
+	\subsection{The Perihelion Precession of Mercury}
+	When Albert Einstein founded the General Theory of Relativity, he proposed three important tests to the theory - amongst which one is to explain the anomalous precession of Mercury's perihelion\footnote{The perihelion is the spatial point on an objects orbit where it is closest to the Sun.} as it orbits the Sun \cite{einstein}. The currently accepted value of Mercury's perihelion precession is 43" (arc seconds) per century, a value which classical Newtonian laws fail to predict. In fact, for some time before Einstein's work, esteemed astronomers like Le Verriere proposed that unobserved 'ghost' planets - or a conglomerate of non-planetary massive objects - within Mercury's orbit was causing its orbital precession, as their observations of Mercury was incompatible with their classical predictions \cite{pollock}. In this project we shall study the orbit of Mercury around the Sun in light of its relativistic motion given by
+	\begin{equation}
+		F_G = \frac{GM_\odot M_{Mercury}}{r^2}\left[1+ \frac{3l^2}{r^2c^2}\right]
+		\label{relativistic}
+	\end{equation}
+	where $r$ is the distance between Mercury and the Sun, $c$ is the speed of light in vacuum and $l = |\mathbf{r}\times\mathbf{v}|$ is the magnitude of Mercury's orbital angular momentum per unit mass\footnote{In order to get dimensionless units.}. Closed elliptical orbits is a special feature of the inverse square law described in equation \eqref{gravitation}. Adding corrections to this law causes open orbital behaviour in which objects on the orbit will displace in each orbital period. Very small corrections, such as the one in equation \eqref{relativistic}, will lead to nearly closed elliptical orbits. In this respect, we may consider the orbit of Mercury to slowly precess around the Sun. This phenomenon is difficult to analyse visually, though, which is why it will be useful to calculate the angle of Mercury's perihelion
+	\begin{equation}
+	\vartheta_p = \arctan\left(\frac{y_p}{x_p}\right)\label{thetaperihelion}
+	\end{equation}
+	during each of Mercury's orbital periods and rather study this relationship.

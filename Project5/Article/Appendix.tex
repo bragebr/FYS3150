@@ -1,0 +1,46 @@
+\appendix
+
+\section{Additional Results}
+
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=\linewidth]{Figures/All_A1_w05_d05_di02_exp.png}
+		\caption{Combination of all additional improvements with $\alpha_0 = 4$, $A = 1$, $\omega = 0.5$, $d = 0.5$, $d_I = 0.2$, $e = 1$ and with exponential vaccination}
+	\label{fig:All}
+	\end{figure}
+Figure \ref{fig:All} shows how the total number of occupants in all compartments $S, \ I \ \text{and} \ R$ evolves for a compound model including vital dynamics, seasonal variation and exponentially increasing vaccination rates. Notice the disease free intervals after 40 units of time. 
+	
+\section{Standard Deviation Plots for Figures \ref{fig:1} a,b,c and d}
+\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.49\linewidth}
+			\includegraphics[width=1.1\linewidth]{Figures/StdDiv_OppgA_4_1_05.png}
+			\caption{$\beta = 1$}
+		\end{subfigure}
+		\begin{subfigure}{0.49\linewidth}
+			\includegraphics[width=1.1\linewidth]{Figures/StdDiv_OppgA_4_2_05.png}
+			\caption{$\beta = 2$}
+		\end{subfigure}
+		\begin{subfigure}{0.49\linewidth}
+			\includegraphics[width=1.1\linewidth]{Figures/StdDiv_OppgA_4_3_05.png}
+			\caption{$\beta = 3$}
+		\end{subfigure}
+		\begin{subfigure}{0.49\linewidth}
+		    \includegraphics[width=1.1\linewidth]{Figures/StdDiv_OppgA_4_4_05.png}
+			\caption{$\beta = 4$}
+		\end{subfigure}
+		\caption{Standard deviation plots belonging to Figure \ref{fig:1}, with different initial value for $\beta$, the rate of recovery. $\alpha = 4$ and $\gamma = 0.5$}
+		\label{fig:StdDiv1}
+	\end{figure}
+	
+Figure \ref{fig:StdDiv1} shows the temporal evolution in the standard deviation in the stochastic simulations for the different networks A,B,C and D. 
+	
+\section{Pulse Vaccination of a Constant Percentage of the Network}
+\begin{figure}[H]
+	\centering
+		\includegraphics[width=\linewidth]{Figures/Vax_25perc_cvar_4_1_05.png}
+		\caption{Vaccination with 25\% of population in S being vaccinated and variable $\gamma$, $\alpha = 4$, $\beta = 1$}
+	\label{fig:const}
+	\end{figure}
+	
+Figure \eqref{fig:const} is a simulation in which a fraction of the susceptible agents are vaccinated after $t = 10$ at regular intervals. The effects are obvious.

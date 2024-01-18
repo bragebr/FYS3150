@@ -1,0 +1,23 @@
+%%Page settings
+
+
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry} %Endrer margen på sidene
+
+\usepackage[utf8]{inputenc}
+\usepackage{babel,textcomp} %Norsk oppsett
+
+\parindent=0cm %Fjerner space på linja etter avnsnitt
+\sloppy %Fjerner bindestreker slik at ord blir flyttet til ny linje
+
+\usepackage{fancyhdr} %Head og foot options
+
+% set the default code style
+\lstset{
+    frame=tb, % draw a frame at the top and bottom of the code block
+    tabsize=4, % tab space width
+    showstringspaces=false, % don't mark spaces in strings
+    numbers=left, % display line numbers on the left
+    commentstyle=\color{green}, % comment color
+    keywordstyle=\color{blue}, % keyword color
+    stringstyle=\color{red} % string color
+}

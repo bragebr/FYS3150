@@ -1,0 +1,113 @@
+\section{Numerical Methods \& Implementation}
+\subsection{Markov Chains and Random Walks}
+Consider a one dimensional finite point lattice where we start at a random position $x$. At each time step, we make a jump. Either one step to the left, or one step to the right.
+The initial position is $x = j\Delta x$, where $\Delta x$ is the length of each jump. Whether we jump left or right, our next position will be $x = i\Delta x$. A probability distribution function (PDF) of the points on the lattice is given by $w_i(t)$, where $i$ is the specific position on the lattice. We also define a transition probability matrix, $W(j\rightarrow i)$. The time development of the system with the PDF and transition probability matrix is now given by
+\begin{align}
+    w_i(t) &= \sum_jW(j\rightarrow i)w_j(t)\label{markovknown}
+\end{align}
+When the transition probability matrix is known, \eqref{markovknown} will give us the steady state of the system when we allow $t\rightarrow \infty$.
+\begin{equation*}
+\lim_{t \rightarrow \infty} \abs{\omega(t + \delta) - \omega(t)} = 0
+\end{equation*}
+The fact that this time development is only dependent on the previous step is a key feature of Markov Chains that is very suitable for the Ising model. We can now implement this in our program by only using the previous state.
+
+From this we get the eigenvalue equation with eigenvalue $\lambda = 1$:
+\begin{equation}
+    W \omega(t = \infty) = \omega(t = \infty)
+\end{equation}
+We can now use this to create a way of transitioning from one state to another. Assuming $W \  \in \ \ \mathbb{R}^{n x n}$ with eigenvectors $\{ v_1, v_2, ... , v_n \}$. We can then write the next state as 
+\begin{eqnarray*}
+\omega_0 &=& \sum^n_{i=1}a_iv_i \\
+\omega_1 &=& \sum^n_{i=1} \lambda_i a_iv_i\\
+&\vdots& \\
+\omega_m &=& \sum^n_{i=1}\lambda_i^m a_i v_i
+\end{eqnarray*}
+with $a$ as an unknown coefficient. The problem we now encounter is the fact that the transition matrix $W$ is either unknown or too complicated to calculate. 
+
+\subsection{The Metropolis Algorithm}
+In our case, the transition probability matrix $W(j\rightarrow i)$ is not known to us. We therefore model it as a product of two probabilities
+\begin{align}
+    W(j\rightarrow i) &= T(j\rightarrow i)A(j\rightarrow i)
+\end{align}
+where $T(j\rightarrow i)$ is the probability for making a transition from a state $j$ to a state $i$, and $A(j\rightarrow i)$ is the probability of accepting a proposed move from state $j$ to state $i$. The time development of the system can then be expressed as
+\begin{align}
+    w_i(t+1) &= \sum_j\left[w_j(t)T_{j\rightarrow i}A_{j\rightarrow i} + w_i(t)T_{i\rightarrow j}(1-A_{i\rightarrow j})\right]\label{transition}
+\end{align}
+if we assume that $T$ and $A$ are time-independent. Since all probabilities are normalized, we can use that $\sum_jT_{i\rightarrow i} = 1$, to rewrite \eqref{transition} to
+\begin{align}
+    w_i(t+1) - w_i(t) &= \sum_j\left[w_j(t)T_{j\rightarrow i}A_{j\rightarrow i} - w_i(t)T_{i\rightarrow j}A_{i\rightarrow j}\right]
+\end{align}
+When $t\rightarrow \infty$ we require that that $w_i(t+1) = w_i$ such that
+\begin{align}
+    \sum_jw_jT_{j\rightarrow i}A_{j\rightarrow i} &= \sum_jw_iT_{i\rightarrow j}A_{i\rightarrow j}
+\end{align}
+To avoid generating cyclic solutions, we introduce a condition, namely a detailed balance
+\begin{align}
+    W(j\rightarrow i)w_j &= W(i\rightarrow j)w_i\\
+    \frac{w_i}{w_j} = \frac{W(j\rightarrow i)}{W(i\rightarrow j)} &= \frac{T_{j\rightarrow i}A_{j\rightarrow i}}{T_{i\rightarrow j}A_{i\rightarrow j}}
+\end{align}
+For the Ising model, we use the Boltzmann distribution as our PDF, such that
+\begin{align}
+    w_i &= \frac{e^{-\beta(E_i)}}{Z}
+\end{align}
+which states the probability of finding the system in a state $i$ with the energy $E_i$, when $\beta = 1/k_BT$. Z is a partition function. This now gives us
+\begin{align}
+    \frac{w_i}{w_j} &= e^{-\beta(E_i - E_j)} = e^{-\beta\Delta E} = \frac{T_{j\rightarrow i}A_{j\rightarrow i}}{T_{i\rightarrow j}A_{i\rightarrow j}}
+\end{align}
+Since the partition function is cancelled out, we never need to worry about it at all. The most simple form of the Metropolis algorithm, is called the \textit{brute force Metropolis algorithm}, which is the algorithm employed in this project. The brute force algorithm assumes that $T_{i\rightarrow j}$ is symmetric, meaning that $T_{i\rightarrow j} = T_{j\rightarrow i}$. This leads to
+\begin{align}
+    \frac{A_{ij}}{A_{ji}} &= e^{-\beta\Delta E}
+\end{align}
+The expression above means that lower energy states are most probable. If we were to accept only moves to states of lower energy, the results of our algorithm would be biased and give a wrong representation of the random walk process. We therefore must allow moves to states of higher probability, and define the acceptance probability $A_{ij}$ as
+\begin{align}
+    A_{ij} &=
+    \begin{cases}
+    e^{-\beta\Delta E}, \qquad \text{for }\Delta E > 0\\
+    1, \qquad\qquad\,\, \text{else}
+    \end{cases}\label{cases}
+\end{align}
+which means that if a move to a state of lower energy is proposed, we accept the move, meaning that $A_{ij} = 1$. If a move to a higher state of energy is proposed, we must check the acceptance probability $A_{ij}$ with the ratio between the probabilities from our PDF. \\ \\
+We have now laid the mathematical ground work for the \textit{brute force Metropolis algorithm} following numerical recipe\\
+
+\fbox{\parbox{\textwidth}{Brute Force Metropolis - Hastings Algorithm:
+\begin{enumerate} \item Initialize a spin lattice with $\mathcal{L}$ spins on its two axes, with a corresponding energy $E_i$ and absolute magnetization $|M_i|$. The initial configuration may be chosen to be ordered or disordered. 
+\item Use a random number generator to seed a random site in the lattice. Propose then a new configuration by forcing a spin flip on the seeded site.
+\item Calculate $\Delta E$ with the seeded site as a local spin center using periodic boundary conditions.
+\begin{itemize}
+    \item If $\Delta E \leq 0$, accept the new configuration.
+    \item If $\Delta E > 0$, calculate $w = e^{-\beta\Delta E}$ and compare with a random number $\in [0,1]$. If the random number is less or equal to $w$, accept the proposed transition in configuration space. Otherwise, reject it.
+\end{itemize}
+\item Update the expectation values.
+\item Repeat for a given amount of Monte Carlo cycles.\end{enumerate}}}\\
+
+After we've gone through the desired number of Monte Carlo cycles, the expectation values may be normalized by dividing by the number of Monte Carlo Cycles. Here, we also divide the expectation value by the total number of spins in the lattice as to obtain the expectation values per spin.\\ \\
+The Ising model has a huge advantage that will help us massively in our calculations. It turns out that $\Delta E$ can only take on 5 possible values! Since we limit ourselves to flipping one spin at a time, we need only concern ourselves with the four nearest neighbors, following the expression for the Hamiltonian of Ising systems.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.7\linewidth]{Figure/figur1.png}
+    \caption{For a spin up center, these are the five possible combinations of the neighboring spins, and their accompanying energy before and after the center spin is flipped.}
+    \label{fig:deltae}
+\end{figure}
+Figure \ref{fig:deltae} shows the five possible changes in energy that can occur when flipping the spin at one point. From the figure, we see that these changes in energy are $\Delta E = \{8J, 4J, 0, -4J, -8J\}$. Since for all non zero values of $\Delta E$ there also an equal, negative $\Delta E$, these five possible outcomes also holds for a spin down center lattice point. This means that we can pre-calculate these values, and do not have to evaluate the change in energy for every MCS, which tremendously lowers the computational cost.
+
+\subsection{Implementation}
+\subsubsection{Periodic boundary conditions}
+When calculating the energy of the system in a specific configuration $i$, we employ so-called \textit{periodic boundary conditions}. For a one dimensional lattice of length $\mathcal{L}$, with particles $s_1, s_2,..,s_L$, this means that the neighbor to the left of $s_1$ takes the value of $s_L$, and the neighbor to the right of $s_L$ takes the value of $s_1$. This is implemented in the following way\\ \\
+\begin{algorithm}[H]
+		\caption{Periodic boundary conditions}
+		\label{periodic}
+		\SetAlgoLined
+		\SetKwFunction{Fperiodic}{periodicBoundaryCondition}
+		\Fperiodic{$i$, $dimension$, $variable$}{\\
+		    \quad (i+dimension+variable) \% dimension\;
+		\KwRet\;
+		}
+\end{algorithm}
+
+This simple little function will return the index of the nearest neighbor to an input lattice point $i$, depending on whether the neighbor is to the left or above, $variable = -1$, or to the right or below, $variable = +1$. This costs us 3 FLOPs, if we consider the modulus operator to count as 1 FLOP. For the neighbor to the left of $s_1$, which is at index $(0)$, the function will return the numerical value of \textit{dimension}, which equals $\mathcal{L}$, the dimension of the lattice. \\ \\
+A more efficient way to implement these boundary conditions would be to initialize the lattice with dimension $\mathcal{L} + 2$, where the extra two lattice points would contain the value of the last lattice point on the other side of the lattice. This means that when initializing, we would give the first value, $s_1$ to the second lattice index, $(1)$, and also to the last lattice index, $(\mathcal{L}+1)$. This would be done in a similar way for all other end points. When our program updates $s_1$, it would also update $s_{L+2}$. This would free us from having to call the function in Algorithm \ref{periodic}, four times for every computation of $\Delta E$, which would save us 12$\mathcal{L}^2$ FLOPs\footnote{Floating Point Operations.} per Monte Carlo sweep.
+
+% Ikke helt sikker på denne seksjonen
+\subsection{Units}
+As was mentioned in the Theory \& Background Section, the coupling constant $J$ and the Boltzmann constant $k_B$ are both set to one in our simulation, that is $J = k_B = 1$. This kind of natural constant scaling is implemented as to avoid under - or overflow errors in our computations, as these constants may take on very numerical values which are difficult to represent accurately on a 64-bit computer. 
+

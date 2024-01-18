@@ -1,0 +1,142 @@
+\section{Numerical Methods and Implementation}
+	\subsection{Implementation and Class Hierarchy}
+	
+	As was mentioned in the introduction of the article, the goal of this numerical project is not only to study differential solvers and the solar system, but also an exercise in designing object oriented code. We therefore see it as necessary to briefly explain the class hierarchy of our program, and how this implementation simultaneously is the foundation for an object oriented, 'recyclable' code which may be extended to study systems beyond our Solar System.\\
+	
+	Our program is based on three abstract classes; \texttt{System}, \texttt{Planet} and \texttt{Solver}. The class \texttt{System} contains settings needed in place to add objects to a list. Said objects are then contained in the system we wish to study. The more interesting class \texttt{Planet} constructs and declares the planets - or objects - we wish to add to our system. Each planet has three fundamental attributes - position, velocity and mass - all which are defined in this class. This class illustrates why our program could be cast into different physical systems. Given that a system contains objects of similar attributes as the planets we are studying in this project, they would be easily defined numerically in \texttt{Planet} - a class which by all means could be called \texttt{Particles} or \texttt{Objects}. It should be noted, however, that Newton's law of gravitation is implemented in \texttt{Planet} as the force acting on a planet from all other planets in the same system. This would naturally have to be changed given that a different physical system is under the influence of a different (or several other) forces when re-devising the program. Lastly, the class \texttt{Solver} is where the magic happens. In this class, the \texttt{EulerForward()}, \texttt{EulerCromer()} and \texttt{VelocityVerlet()} - solvers are all declared. This class inherits objects from \texttt{Planet} and systems of said objects from \texttt{System}, allowing us to perform operations on them to produce results.
+	\subsection{A Psuedocode for Calculating the Net Force on a Given Planet}
+	Going forward, we shall shed light on the numerical implementation of the three algorithms we are studying. In each of them, the calculation of the net force acting on a given planet in a given system acts as the backbone of the algorithm, which is why we introduce it here. We will also present the implementation of each algorithm as psuedocode, which is why we encourage the reader to visit our GITHUB repository linked on the first page in the article to view all code. 
+	
+	\IncMargin{1em}
+	\begin{algorithm}[H]
+		\caption{Calculate Net Force}
+		\label{algonetforce}
+		\SetAlgoLined
+		
+		\SetKwData{Left}{left}\SetKwData{This}{this}\SetKwData{Up}{up}
+		\SetKwFunction{Union}{Union}\SetKwFunction{FindCompress}{FindCompress}
+		\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+		\Input{System}
+		\Output{Net force on Planet ($\mathbf{F}\in \mathbb{R}^3$)}
+		\textbf{Var}:\\
+		i, n, planet\_idx, otherPlanet\_idx, System.TotalPlanets $\in \mathbb{N}$\\
+		System.AllPlanets $\in \mathbb{N}^{1\times P}, \ \ \ P = \text{Number of planets in System}$
+		
+		\For{i \KwTo $n-1$}{
+		\For{\text{Planet\_idx} \KwTo \text{System.TotalPlanets-1}}{current\_planet = System.AllPlanets[planet\_idx]\\
+		
+		\For{otherPlanet\_idx \KwTo System.TotalPlanets - 1}{current\_planet.Force += Force\_From\_OtherPlanet}}
+		}
+	\end{algorithm}
+	As we see in Algorithm \ref{algonetforce}, it takes \texttt{System} as input, in which there exists information about the total number of planets we are dealing with (\texttt{System.TotalPlanets}) and a ordered list of planets (\texttt{System.AllPlanets}). \texttt{Force\_From\_OtherPlanet} is naturally the gravitational force exerted from one planet onto another as in equation \ref{gravitation} at the position the planet is currently in. 
+	
+	\subsection{The Euler-Forward Algorithm}
+	The Euler-Forward algorithm may be given as a set of discrete recursive relations as
+	
+	\begin{equation}
+		\begin{cases}
+		\mathbf{r}_{k+1} = \mathbf{r}_k + h\mathbf{v}_k\\
+		\mathbf{v}_{k+1} = \mathbf{v}_k + (h/M_i)\mathbf{F}^{(\text{NET})}_i\\
+		\mathbf{r}_0 = (x_0, y_0,z_0),\ \ \mathbf{v}_0 = (v^{(x)}_0, v^{(y)}_0,v^{(z)}_0)
+		\end{cases}
+		\label{eulerforward}
+	\end{equation}
+	Counting the number of FLOPs to 5$N$, we may observe that this implementation comes at low computational cost. One could compute the acceleration outside of the algorithm to reduce the number of FLOPs to 4$N$. This however only applies to the iterative recursion, not the program itself! In reality, one should also count the FLOPs involved in calculating the gravitational force between planets to get a true value of the number of FLOPs for the algorithm in its entirety. The FLOPs we present are however representative of the order of the number of FLOPs, and are really only used for comparison between the different algorithms. The Euler - Forward method also carries a global truncation error $\mathcal{O}(h)$, ensuring a linear relationship between the numerical error and the step size $h$. It should also be noted that the Euler-Forward method is \textit{non-symplectic}, meaning that it does not belong to the class of energy-conserving integrators. We shall see the consequence of this in the Results - section. The algorithm may be implemented as\\
+	
+	
+	\begin{algorithm}[H]
+		\caption{Euler-Forward Algorithm}
+		\label{algoEF}
+		\SetAlgoLined
+		
+		\SetKwData{Left}{left}\SetKwData{This}{this}\SetKwData{Up}{up}
+		\SetKwFunction{Union}{Union}\SetKwFunction{FindCompress}{FindCompress}
+		\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+		\Input{System}
+		\Output{Current planet position at time $t_i$ ($\mathbf{r} \in \mathbb{R}^3)$}
+		\textbf{Var}:\\
+		h $\in \mathbb{R}$\\
+		\textbf{top}:	\text{current\_planet.Force $\to$ Calculate\_Net\_Force()}
+		\text{\textbf{update} curret\_planet.position $\to$ h$\cdot$current\_planet.velocity}
+		\text{\textbf{update} current\_planet.velocity $\to$ h$\cdot$current\_planet.Force/current\_planet.mass}
+		\newline
+	\textbf{goto}: \textbf{top}
+	\end{algorithm}
+	
+	
+	\subsection{The Euler - Cromer Algorithm}
+	The Euler - Cromer -, or semi-implicit Euler method is a first order symplectic algorithm, meaning that it commits a global truncation error of $\mathcal{O}(h)$. Its symplecticity is said to \textit{almost} conserve physical quantities in conservative fields, making it a suitable candidate for solving the problem at hand. This algorithm may be implemented as a set of discrete recursive relations by
+
+		\begin{equation}
+	\begin{cases}
+	\mathbf{v}_{k+1} = \mathbf{v}_k + (h/M_i)\mathbf{F}^{(\text{NET})}_i\\
+	\mathbf{r}_{k+1} = \mathbf{r}_k + h\mathbf{v}_{k+1}\\
+	\mathbf{r}_0 = (x_0, y_0,z_0),\ \ \mathbf{v}_0 = (v^{(x)}_0, v^{(y)}_0,v^{(z)}_0)
+	\end{cases}
+	\label{eulercromer}
+	\end{equation}
+	
+	The number of FLOPs required to performed $N$ iterations with the Euler-Cromer scheme is, as for the Euler - Forward scheme 5$N$, making it a low cost algorithm, too. The schemes are remarkably similar, as the major difference is that in the Euler Cromer scheme, the position vector is overwritten using the velocity vector one time step ahead, whilst in the Euler Forward scheme it is overwritten using the current velocity vector. This algorithm is implemented as\\
+	
+	\begin{algorithm}[H]
+		\caption{Euler-Cromer Algorithm}
+		\label{algoEC}
+		\SetAlgoLined
+		
+		\SetKwData{Left}{left}\SetKwData{This}{this}\SetKwData{Up}{up}
+		\SetKwFunction{Union}{Union}\SetKwFunction{FindCompress}{FindCompress}
+		\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+		\Input{System}
+		\Output{Current planet position at time $t_i$ ($\mathbf{r} \in \mathbb{R}^3)$}
+		\textbf{Var}:\\
+		h $\in \mathbb{R}$\\
+		\textbf{top}:	\text{current\_planet.Force $\to$ Calculate\_Net\_Force()}
+		\text{\textbf{update} current\_planet.velocity $\to$ h$\cdot$current\_planet.Force/current\_planet.mass}
+		\text{\textbf{update} curret\_planet.position $\to$ h$\cdot$current\_planet.velocity}
+		\newline
+	\textbf{goto}: \textbf{top}
+	\end{algorithm}
+	
+	\subsection{The Velocity Verlet Algorithm}
+	
+	Now, onto the Velocity Verlet algorithm. This algorithm belongs to a whole class of Verlet integrators, and has the initial advantage over the Euler schemes of being a second order symplectic integrator. This means that, in contrasts to the Euler schemes, the Verlet algorithm commits a global truncation error of $\mathcal{O}(h^2)$ such that a ten-fold increase in the temporal resolution leads to a hundred-fold increase in the numerical precision. Simultaneously, its symplecticity ensures conservation of physical quantities in conservative fields. Adding to the list of why the Verlet schemes are interesting, they allow for time-reversibility as the first and final step of the scheme are exactly the same. This means that the integrator could potentially be extended to Hamiltonian systems in which negative time exists! However, departing from the small side track, the Velocity Verlet algorithm may be implemented as a set of discrete recursive relations as
+	
+		\begin{equation}
+	\begin{cases}
+	
+	\mathbf{r}_{k+1} = \mathbf{r}_k + h\mathbf{v}_{k} + (h^2/2)\mathbf{a}_k\\
+	\mathbf{v}_{k+1} = \mathbf{v}_k + (h/2)\left(\mathbf{a}_{k+1} + \mathbf{a}_k\right)\\
+	\mathbf{r}_0 = (x_0, y_0,z_0),\ \ \mathbf{v}_0 = (v^{(x)}_0, v^{(y)}_0,v^{(z)}_0)\\
+	\mathbf{a}_0 = -\sum_{j=1}^{N}GM_j(\mathbf{r}^{(0)}_{ij}/|\mathbf{r}^{(0)}_{ij}|^3)
+	\end{cases}
+	\label{vv}
+	\end{equation}
+	
+	Here, $\mathbf{r}^{(0)}_{ij}$ should be read as the radial vector pointing from body $i$ to body $j$ when body $i$ is in its initial position $\mathbf{r}_0 = (x_0,y_0,z_0)$. Counting the number of FLOPs, we see that this algorithm commits a total number of 9$N$ FLOPs. Comparing this against the number of FLOPs committed by the Euler schemes, we see that the Velocity Verlet method is slightly less efficient. The following psuedocode gives an idea of how this is implemented on a computer\\
+	
+		\begin{algorithm}[H]
+		\caption{Velocity Verlet Algorithm}
+		\label{algoVV}
+		\SetAlgoLined
+		
+		\SetKwData{Left}{left}\SetKwData{This}{this}\SetKwData{Up}{up}
+		\SetKwFunction{Union}{Union}\SetKwFunction{FindCompress}{FindCompress}
+		\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+		\Input{System}
+		\Output{Current planet position at time $t_i$ ($\mathbf{r} \in \mathbb{R}^3)$}
+		\textbf{Var}:\\
+		h $\in \mathbb{R}$\\
+		\textbf{top}:	\text{current\_planet.Force $\to$ Calculate\_Net\_Force()}
+		\text{\textbf{update} current\_planet.position $\to$ h$\cdot$current\_planet.velocity + $(h^2/2)$current\_planet.Acceleration}
+		\text{\textbf{set} curret\_planet.Force\_New $\to$ Calculate\_Net\_Force.at(current\_planet.position)}
+		\text{\textbf{update} current\_planet.velocity $\to$ $h/2$(current\_planet.Acceleration\_New + current\_planet.Acceleration)}
+		\newline
+	\textbf{goto}: \textbf{top}
+	\end{algorithm}
+	
+	\subsection{Unit Tests and Logical Test Functions}\label{tests}
+	Unit tests are an essential part of program development as they ensure each part of the implementation produces the results it is supposed to. For this project, we have implemented many such tests, but none of these are worth paying attention to in this article - consult \texttt{unittests.cpp} under the Code-folder in our GITHUB - repository to see these tests. \\
+	
+	It is worthwhile however, to briefly explain how and why we have implemented logical test functions in our program. In the Results - section we exhibit data about the numerical errors associated with each of the three solvers we study in this project, and a natural question should be how this error computation was performed. Consider the simple Earth-Sun system in which we assume the Earth's orbit is circular. We study this system with good reason, as it allows us not only to compare run times for large $N$ within a suitable time frame, but also because it allows us to design a logical operation for determining the maximum relative error in order to compare numerical precision. Given a circular orbit, the length of Earth's position vector should for each time step have a magnitude of one. Using this, our program contains a test function \texttt{TEST\_circular()} which compares the length of each position vector and the theoretical length. The absolute value of this difference is what we take to be a numerical error. The program then goes on to find the maximum error and returns this.\\
+	
+	Furthermore, our program incorporates Kepler's second law to determine whether the angular momentum of a planet's orbit is conserved. The magnitude of the position vector relative to the Sun is stored for the previous and current time step, along with the distance travelled along the orbit for the time step. The area of the triangle these vectors make is stored for each time step, and compared to the area of the previous triangle in the function \texttt{TEST\_kepler()}. The areas are compared, and if they differ by more than a set tolerance\footnote{In our case, we have set a tolerance of $10^{-10}$}, the angular momentum for the system is not conserved.

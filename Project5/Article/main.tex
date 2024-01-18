@@ -1,0 +1,169 @@
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Academic Title Page
+% LaTeX Template
+% Version 2.0 (17/7/17)
+%
+% This template was downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (LaTeX - Title Creation) with modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+% Instructions for using this template:
+% This title page is capable of being compiled as is. This is not useful for 
+% including it in another document. To do this, you have two options: 
+%
+% 1) Copy/paste everything between \begin{document} and \end{document} 
+% starting at \begin{titlepage} and paste this into another LaTeX file where you 
+% want your title page.
+% OR
+% 2) Remove everything outside the \begin{titlepage} and \end{titlepage}, rename
+% this file and move it to the same directory as the LaTeX file you wish to add it to. 
+% Then add \input{./<new filename>.tex} to your LaTeX file where you want your
+% title page.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONShttps://www.overleaf.com/project/5f9756abfb48e8000183dcde
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt]{article}
+
+\input{Oppsett/Packages}
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\parindent = 0cm
+
+
+\begin{document}
+	%----------------------------------------------------------------------------------------
+	%	TITLE PAGE
+	%----------------------------------------------------------------------------------------
+	
+	\begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+		\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for horizontal lines, change thickness here
+		
+		\center % Centre everything on the page
+		
+		%------------------------------------------------
+		%	Headings
+		%------------------------------------------------
+		
+		\textsc{\LARGE University of Oslo}\\[1.5cm] % Main heading such as the name of your university/college
+		
+		\textsc{\Large FYS3150}\\[0.5cm] % Major heading such as course name
+		
+		\textsc{\large Computational Physics}\\[0.5cm] % Minor heading such as course title
+		
+		%------------------------------------------------
+		%	Title
+		%------------------------------------------------
+		
+		\HRule\\[0.4cm]
+		
+		{\huge\bfseries Modelling Contagion Dynamics\\
+		\Large{A Numerical Study of Deterministic and Stochastic Methods for the SIR Model}\\[0.4cm] % Title of your document
+		}
+		\HRule\\[1.5cm]
+		
+		%------------------------------------------------
+		%	Author(s)
+		%------------------------------------------------
+		
+		%	\begin{minipage}{0.4\textwidth}
+		%		\begin{flushleft}
+		%			\large
+		%			\textit{Author}\\
+		%			B.J. \textsc{Blazkowicz} % Your name
+		%		\end{flushleft}
+		%	\end{minipage}
+		%	~
+		%	\begin{minipage}{0.4\textwidth}
+		%		\begin{flushright}
+		%			\large
+		%			\textit{Supervisor}\\
+		%			Dr. Caroline \textsc{Becker} % Supervisor's name
+		%		\end{flushright}
+		%	\end{minipage}
+		
+		% If you don't want a supervisor, uncomment the two lines below and comment the code above
+		{\large\textit{Authors}}\\
+		\textsc{Lars Kristian Skaar}\\
+		\textsc{Håkon Lindholm}\\
+		\textsc{Brage Brevig} % Your name
+		\\
+		\url{https://github.uio.no/lkskaar/FYS3150}
+		%------------------------------------------------
+		%	Date
+		%------------------------------------------------
+		
+		\vfill\vfill\vfill % Position the date 3/4 down the remaining page
+		
+		{\large\today} % Date, change the \today to a set date if you want to be precise
+		
+		%------------------------------------------------
+		%	Logo
+		%------------------------------------------------
+		
+		\vfill\vfill
+		%\includegraphics[width=0.5\textwidth]{logouio.png}\\[6cm] % Include a department/university logo - this will require the graphicx package
+		
+		%----------------------------------------------------------------------------------------
+		
+		%\vfill % Push the date up 1/4 of the remaining page
+		
+	\end{titlepage}
+
+	%---------------------------------------------------------------------------------%-------
+	\newpage
+	\setstretch{1.5}
+	\setlength\parindent{0pt}
+	\tikzstyle{compartments} = [rectangle, rounded corners, minimum width = 3cm, minimum height = 1cm, text centered, draw = black, fill = gray!30]
+	\tikzstyle{arrow} = [thick, ->, >=stealth]
+	\section{Abstract}
+    We evaluate the spread of disease in a network with the SIRS model. This is solved using the 4th order Runge-Kutta method, and Monte Carlo simulations. We start with a basic set of coupled differential equations, governed by rate of transmission, rate of recovery and rate of immunity loss. Later, more parameters are added to the model. This includes vital dynamics, seasonal variation of infection and vaccination. We wish to look at how the SIRS model can be used to model infectious diseases in the real world, and also survey the differences between a deterministic approach (Runge-Kutta) and stochastic one (Monte Carlo). We find that in many cases there is a good agreement between the two methods, but in some cases there is a large deviation, in which the stochastic simulation predicts an entirely different outcome than the deterministic approach. We study the effects of seasonal changes in the rate of transmission, and find that the networks arrive at an equilibrium, in which the total number of agents in each compartment fluctuates. The deterministic approach predicts a consistency in the peak numbers of infected agents, whilst the stochastic approach predicts a more realistic variation. A pulse vaccination strategy, being the most commonly used method to eradicate infection, is modeled and found to significantly reduce infection in the network over time. This is compared to a less realistic exponentially growing rate of vaccination, which dramatically reduces the number of infected agents when implemented. 
+
+	
+	\newpage
+	\tableofcontents
+	\newpage
+	
+	\input{Introduction}
+	\input{Theoryandbackground} 
+	\input{Numericalmethods}
+	\input{Results}
+	\input{Discussion}
+	\input{Conclusion}
+	\input{Appendix}
+	
+	\newpage
+	\addcontentsline{toc}{section}{References}
+	\begin{thebibliography}{5}
+        \bibitem{SIR}
+        Weiss, H. (2013). \texit{The SIR model and the Foundations of Public Health}. MATerials MATemàtics, Volum 2013, treball no. 3, 17 pp. ISSN: 1887-1097. \url{http://mat.uab.cat/matmat_antiga/PDFv2013/v2013n03.pdf}
+        
+        \bibitem{uganda}
+        Berrang-Ford, L., Odiit, M., Maiso, F., Waltner-Toews, D., & McDermott, J. (2006). \textit{Sleeping sickness in Uganda: revisiting current and historical distributions. African health sciences}, 6(4), 223–231.
+        \url{https://doi.org/10.5555/afhs.2006.6.4.223}
+        
+        \bibitem{historypandemics}
+        Huremović D. (2019). Brief History of Pandemics (Pandemics Throughout History). \textit{Psychiatry of Pandemics: A Mental Health Response to Infection Outbreak}, 7–35.
+        \url{https://doi.org/10.1007/978-3-030-15346-5_2 }
+        
+        \bibitem{seasonal1}
+        Grassly, N. C., & Fraser, C. (2006). Seasonal infectious disease epidemiology.\textit{Proceedings. Biological sciences}, 273(1600), 2541–2550.
+        \url{https://doi.org/10.1098/rspb.2006.3604}
+        
+        \bibitem{seasonal2}
+        Fares A. (2013). Factors influencing the seasonal patterns of infectious diseases. \textit{International journal of preventive medicine}, 4(2), 128–132.
+        \url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1634916/}
+	\end{thebibliography}
+	
+\end{document} 

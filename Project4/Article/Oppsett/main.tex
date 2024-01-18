@@ -1,0 +1,162 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Academic Title Page
+% LaTeX Template
+% Version 2.0 (17/7/17)
+%
+% This template was downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (LaTeX - Title Creation) with modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+% Instructions for using this template:
+% This title page is capable of being compiled as is. This is not useful for 
+% including it in another document. To do this, you have two options: 
+%
+% 1) Copy/paste everything between \begin{document} and \end{document} 
+% starting at \begin{titlepage} and paste this into another LaTeX file where you 
+% want your title page.
+% OR
+% 2) Remove everything outside the \begin{titlepage} and \end{titlepage}, rename
+% this file and move it to the same directory as the LaTeX file you wish to add it to. 
+% Then add \input{./<new filename>.tex} to your LaTeX file where you want your
+% title page.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONShttps://www.overleaf.com/project/5f9756abfb48e8000183dcde
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt]{article}
+
+\input{Oppsett/Packages}
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\parindent = 0cm
+
+
+\begin{document}
+	%----------------------------------------------------------------------------------------
+	%	TITLE PAGE
+	%----------------------------------------------------------------------------------------
+	
+	\begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+		\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for horizontal lines, change thickness here
+		
+		\center % Centre everything on the page
+		
+		%------------------------------------------------
+		%	Headings
+		%------------------------------------------------
+		
+		\textsc{\LARGE University of Oslo}\\[1.5cm] % Main heading such as the name of your university/college
+		
+		\textsc{\Large FYS3150}\\[0.5cm] % Major heading such as course name
+		
+		\textsc{\large Computational Physics}\\[0.5cm] % Minor heading such as course title
+		
+		%------------------------------------------------
+		%	Title
+		%------------------------------------------------
+		
+		\HRule\\[0.4cm]
+		
+		{\huge\bfseries The Ising Model for Magnetic Materials\\
+		\Large{Modelling Magnetic Phase Transitions Devising the\\ Metropolis - Hastings Algorithm}\\[0.4cm] % Title of your document
+		}
+		\HRule\\[1.5cm]
+		
+		%------------------------------------------------
+		%	Author(s)
+		%------------------------------------------------
+		
+		%	\begin{minipage}{0.4\textwidth}
+		%		\begin{flushleft}
+		%			\large
+		%			\textit{Author}\\
+		%			B.J. \textsc{Blazkowicz} % Your name
+		%		\end{flushleft}
+		%	\end{minipage}
+		%	~
+		%	\begin{minipage}{0.4\textwidth}
+		%		\begin{flushright}
+		%			\large
+		%			\textit{Supervisor}\\
+		%			Dr. Caroline \textsc{Becker} % Supervisor's name
+		%		\end{flushright}
+		%	\end{minipage}
+		
+		% If you don't want a supervisor, uncomment the two lines below and comment the code above
+		{\large\textit{Authors}}\\
+		\textsc{Lars Kristian Skaar}\\
+		\textsc{Håkon Lindholm}\\
+		\textsc{Brage Brevig} % Your name
+		\\
+		\url{https://github.uio.no/lkskaar/FYS3150}
+		%------------------------------------------------
+		%	Date
+		%------------------------------------------------
+		
+		\vfill\vfill\vfill % Position the date 3/4 down the remaining page
+		
+		{\large\today} % Date, change the \today to a set date if you want to be precise
+		
+		%------------------------------------------------
+		%	Logo
+		%------------------------------------------------
+		
+		\vfill\vfill
+		%\includegraphics[width=0.5\textwidth]{logouio.png}\\[6cm] % Include a department/university logo - this will require the graphicx package
+		
+		%----------------------------------------------------------------------------------------
+		
+		%\vfill % Push the date up 1/4 of the remaining page
+		
+	\end{titlepage}
+
+	%---------------------------------------------------------------------------------%-------
+	\newpage
+	\setstretch{1.5}
+	\setlength\parindent{0pt}
+	
+	\section{Abstract}
+    The Markov Chain Monte Carlo (MCMC) - based Metropolis - Hastings Algorithm (MHA) is here devised to study two - dimensional spin lattices, herein via the Ising model. The study has a ladder - like structure, in which we first study the simple 2x2 spin lattice in order to compare our numerical implementation of the MHA against benchmark analytical solutions. Having studied the performance of our program, we proceed to explore the larger 20x20 spin lattice from which we are able to determine the MCMC equilibration time, which we use to optimize the random sampling of even larger spin lattices. The physical systems, regardless of size, are studied in detail by considering aspects such as energy distribution, expectation values for quantities such as energy and absolute magnetization, and lastly the critical temperature $T_C$. We find that our implementation of the MHA produces numerical results which commit relatives error of order $10^{-5}$ for 10$^{6}$ Monte Carlo sweeps through the 2x2 lattice, and that the larger 20x20 spin lattice reaches a steady state within the range of 5$\cdot10^{3}$ - 10$^{4}$ Monte Carlo sweeps when the spin lattice is initially disordered. The study of even larger systems lead to results which clearly indicate configurational phase transitions, which in turn allowed us to numerically extract the critical temperature in an infinitely large spin lattice. We found this to hold the value of $2.289$, deviating from the theoretical value obtained by Onsager ($T_C = 2/\sqrt{1 + \sqrt{2}} \approx 2.269)$ by 0.8\%. 
+	
+	
+	
+	\newpage
+	\tableofcontents
+	\newpage
+	
+	\input{Introduction}
+	\input{Theoryandbackground} 
+	\input{Numericalmethods}
+	\input{Results}
+	\input{Discussion}
+	\input{Conclusion}
+	
+	\newpage
+	\addcontentsline{toc}{section}{References}
+	\begin{thebibliography}{5}
+        \bibitem{statphys}
+        M. Plischke and B. Bergersen, \textit{Equilibrium State Physics}, World Scientific, chapters 5 and 6
+        \bibitem{nightingale}
+        Nightingale, M. P. and Bl\"ote, H. W. J. (1996), \textit{Dynamic Exponent of the Two-Dimensional Ising Model and Monte Carlo Computation of the Subdominant Eigenvalue of the Stochastic Matrix}. Phys. Rev. Lett. 76, 24, pp. 4548-4551
+        \bibitem{walter}
+        J.-C. Water and G.T. Barkema, \textit{An introduction to Monte Carlo methods}. PDF, 6-8. \\
+        \url{https://arxiv.org/pdf/1404.0209.pdf}
+        \bibitem{carlon}
+        Carlon, E. (2013), \textit{Advanced Monte Carlo Methods.} PDF, 15-16\\
+        \url{http://itf.fys.kuleuven.be/~enrico/Teaching/monte_carlo_2012.pdf}
+        \bibitem{gould}
+        Harvey, G. and Tobochnik, J. (1989), \textit{Overcoming Critical Slowing Down}. PDF, 1-3.\\
+        \url{https://aip.scitation.org/doi/pdf/10.1063/1.4822858}
+	\end{thebibliography}
+	
+\end{document} 

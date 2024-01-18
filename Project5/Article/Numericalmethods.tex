@@ -1,0 +1,62 @@
+\section{Numerical Methods and Implementation}
+\subsection{The Runge - Kutta Method}
+As we saw in \ref{section: SIRStheory}, we may develop a numerical SIRS model by taking $S(t), \ I(t) \ \text{and} \ R(t)$ to be continuous variables in time, leading to the set of coupled differential equations \eqref{SIRS}. By solving each differential equation we obtain numerical solutions describing the temporal development of the number of agents existing in each compartment for an arbitrary simulation period. In order to solve \eqref{SIRS} numerically, we devise a Runge - Kutta method of fourth order (RK4) as this solver commits a global error of $\mathcal{O}(h^4)$ for a given temporal resolution $h$. In our simulations, we have adapted temporal resolutions in the range of $10^{-2} - 10^{-3}$, committing very small global errors in order of $\mathcal{O}(10^{-8}) - \mathcal{O}(10^{-12})$. The RK4 method, like many other numerical integrators, solves differential equations by approximating the slope of the unknown solution $y(t)$ on partitioned\footnote{Partitions of the interval $(t_0, t_f)$ for some finite simulation time $t_f$.} intervals $(t_n, t_n + \Delta t)$, for which $\Delta t$ may be taken as $h$ in our case. The approximation is made by weighting an average gradient in this interval by determining incremental gradients $k_1, k_2,k_3\ \text{and} \ k_4$ at three temporal increments of $(t_n, t_n+h)$ in the following procedure\\
+\newline
+\fbox{\parbox{\textwidth}{Computation of Incremental Gradients:
+\begin{itemize}
+\label{list:ks}
+    \item Compute $k^{(n)}_1 = f(t_n,y_n)$ 
+    \item Compute $k^{(n)}_2 = f(t_n + h/2, y_n + hk_1/2)$
+    \item Compute $k^{(n)}_3 = f(t_n + h/2, y_n + hk_2/2)$
+    \item Lastly, compute $k^{(n)}_4 = f(t_n + h, y_n + hk_3)$
+    \item Update the solution by $y_{n+1} = y_n + (1/6)(k_1 + 2(k_2 + k_3) + k_4)$ and the current time by $t_{n+1} = t_n + h$
+\end{itemize}}}
+\newline
+\\
+where $k^{(n)}_i$ denotes the incremental gradients $k_i$ belonging to a solution $y_n$ on the interval $(t_n, t_n + h)$. With Procedure \ref{list:ks} in place, a recipe for our numerical implementation of follows
+
+\fbox{\parbox{\textwidth}{RK4 Algorithm for SIRS Model:
+\begin{enumerate}
+\label{list:RK4}
+
+   \item Initialize two vectors $\mathcal{S},\ \mathcal{D} \ \in \ \mathbb{R}^3$  in which we store the global solutions $S,\ I \ \text{and} \ R$ and derivatives $f(t_n,S_n),\ g(t_n, I_n) \ \text{and}\ h(t_n, R_n)$ respectively with $S_0, \ I_0, \ R_0\ \text{and} \ t_0$.
+   \item Pass the vectors to a function \texttt{RK4()}
+   \item Within the function \texttt{RK4()}, initialize local vectors $\mathcal{K}_1, \ \mathcal{K}_2, \ \mathcal{K}_3, \ \mathcal{K}_4, \ \mathcal{Y} \ \in \ \mathbb{R}^3 $ in which we store the incremental gradients $k^{(n)}_i$ and local solutions $S_n,\ I_n \ \text{and} \ R_n$
+   \item Loop through the local vectors in order to compute all incremental gradients and local solutions, finally updating the global solutions.  
+\end{enumerate}}}
+
+
+
+
+\subsection{Random Sampling - Dynamical Monte Carlo Simulation}
+
+In the previous section, we explained in what way the RK4 method may be implemented in order to study the SIRS model. Solving the set of differential equations in \eqref{SIRS} serves the purpose of deterministically computing the fraction of agents in each compartment at every time point. What we mean by this is that every updated solution is entirely dependent on the previous solution, and more importantly that, given the same initial conditions, the model will always return the same values. The model becomes flawed in the sense that it fails to capture the 
+random nature of reality. To remedy this flaw, we implement a stochastic method for a Monte Carlo simulation of how an infectious disease spreads within a network. This implementation allows for simulations which deviate greatly from the deterministic model, and by that opens up for greater statistical interpretation of the model. By performing more and more simulations, we may also compute the expected temporal state
+evolution
+\fbox{\parbox{\textwidth}{Numerical Recipe for Stochastic Simulation of SIRS Model:
+\begin{enumerate}
+    \item Initialize a vector $\mathcal{S}$ in which we store the states $S,\ I\ \text{and}\ R$ in each temporal step.
+    \item Calculate $\Delta t = \text{min}\{T_1, T_2, ... \ , T_n\}$ for the $n$ different state transitions.
+    \item Calculate the respective transition probabilities $P(i\to j) =  T_i \Delta t,\ \text{for}\ i = 1,2,3,...\ ,n$
+    \item Generate a random number $r$, and measure it against all state transition probabilities.
+    
+    If $r < P(i\to j)$, accept the proposal and update the states $i,j \in \mathcal{S}$ by $\pm 1$ depending on the transition type and move onto the next possible state transition. Else, reject the proposal and move onto the next possible state transition.
+    
+    \item When all possible state transitions have been tested, the current time and state vector may be passed to a file for plotting purposes. The current time is in this step updated by $dt$. 
+    
+    \item Repeat steps 3-5.
+    
+    \item Repeat steps 1-6 for a given number of simulations/experiments. In each simulation, pass every state vector to a list at each time point in order to find the average state vector at each time point. 
+\end{enumerate}}}
+
+\subsubsection{Remarks on the Computation of $\Delta t$}
+In Sections \ref{section: SIRStheory} and \ref{improvingmodel} we explained in what way the temporal resolution $\Delta t$ is computed in our program in order to ensure sufficiently small time steps for which we may realistically sample transitions made by a single agent in the network. However, in the case of improving the basic SIRS model, this computation may lead to dynamical computation of a time-dependent $\Delta t (t)$ as the network size $N(t)$ may vary greatly, as the seasonally variant transmission rate $\alpha(t)$ is introduced, or when the temporally variant vaccination function $f(t)$ is implemented. The fact that the time it takes for a possible transition to occur varies is actually an extra improvement on the Monte Carlo simulation itself, but we have chosen to fixate $\Delta t$ in each simulation as varying the temporal resolution causes each simulation to have a different number of temporal points. This in turn makes it difficult to create sensible averages at each time point, as one would have to extrapolate averages between a set of time points within a given range. We have chosen not to do this in our project, as fixating $\Delta t$ in each simulation produces interesting results in the first place.\\
+
+\subsubsection{Remarks on the Implementation of the Vaccination Function $f(t)$}
+\label{section:vacfunc}
+When implementing the vaccination function, we encounter a problem with the homogeneous population assumption for the SIRS model. This assumption hinders us in keeping track of the health status of the 'individual' agents existing in $R$, as the concept of individuality is non-existent in this model. Each agent may have transitioned into $R$ by either vaccination or by recovery from the disease, and without a proper implementation of individual health status IDs for each agent, it becomes possible for vaccinated agents to transition into $S$. In order to account for this issue we implement a new rate of loss of immunity $\gamma$ which, for every agent transitioning into $R$ by vaccination, updates by
+
+\begin{equation*}
+    \gamma(t+\Delta t) = \gamma(t) - \frac{\gamma(t)}{2N}
+\end{equation*}
+In this way, it becomes less and less likely for agents in $R$ to transition back into $S$, following the evolution of agents moving directly from $S$ to $R$. In another attempt to more rigorously remedy the lacking health status ID issue, we initialized a fourth compartment $R_\text{TOT}$ in which we stored the total number of recovered agents. In this way, vaccinated agents in $S$ moved directly to $R_\text{TOT}$, whilst recovered agents moved from $I$ to $R$ with the possibility of transitioning back into $S$. In this way, there is no need to change the rate of loss of immunity. However, as this caused us to run into issues with the plotting and representation of the data for the larger compound simulations (see Appendix A), we stuck to the first method described in this section. 
